@@ -3,7 +3,7 @@
 import FileInput from "@/components/FileInput";
 import FormField from "@/components/FormField";
 
-import React, { ChangeEvent, FormEvent, useState, useRef } from "react";
+import React, { ChangeEvent, FormEvent, useState } from "react";
 import { useFileInput } from "@/hooks/useFileInput";
 import { MAX_THUMBNAIL_SIZE, MAX_VIDEO_SIZE } from "@/constants";
 

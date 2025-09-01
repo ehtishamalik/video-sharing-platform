@@ -1,10 +1,9 @@
-import React, { useCallback } from "react";
+import React from "react";
 
 const FormField = ({
   id,
   label,
   options,
-  type,
   placeholder,
   value,
   as = "input",

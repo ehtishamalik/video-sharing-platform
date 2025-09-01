@@ -56,49 +56,69 @@ export async function getAllVideos({
   pageNumber = 1,
   pageSize = 8,
 }: GetAllVideos) {
-  const session = await auth.api.getSession({
-    headers: await headers(),
-  });
+  try {
+    const session = await auth.api.getSession({
+      headers: await headers(),
+    });
 
-  const currentUserId = session?.user.id;
+    const currentUserId = session?.user.id;
 
-  if (!currentUserId) {
-    throw new Error("Unauthorized");
+    if (!currentUserId) {
+      throw new Error("Unauthorized");
+    }
+
+    const canSeeTheVideos = or(
+      eq(video.userId, currentUserId),
+      eq(video.visibility, "public")
+    );
+
+    const whereConditions = searchQuery.trim()
+      ? and(canSeeTheVideos, doesTitleMatch(video, searchQuery.trim()))
+      : canSeeTheVideos;
+
+    const [{ totalCount }] = await db
+      .select({ totalCount: sql`count(*)` })
+      .from(video)
+      .where(whereConditions);
+
+    const totalVideos = Number(totalCount || 0);
+
+    const totalPages = Math.ceil(totalVideos / pageSize);
+
+    const videoRecords = await buildVideoWithUserQuery()
+      .where(whereConditions)
+      .orderBy(
+        sortFilter ? getOrderByClause(sortFilter) : sql`${video.createdAt} DESC`
+      )
+      .limit(pageSize)
+      .offset((pageNumber - 1) * pageSize);
+
+    return {
+      videos: videoRecords,
+      pagination: {
+        currentPage: pageNumber,
+        totalPages,
+        totalVideos,
+        pageSize,
+      },
+    };
+  } catch (error) {
+    console.error("Error fetching videos:", error);
+    return {
+      videos: [],
+      pagination: { currentPage: 1, totalPages: 0, totalVideos: 0, pageSize },
+    };
   }
+}
 
-  const canSeeTheVideos = or(
-    eq(video.userId, currentUserId),
-    eq(video.visibility, "public")
-  );
-
-  const whereConditions = searchQuery.trim()
-    ? and(canSeeTheVideos, doesTitleMatch(video, searchQuery.trim()))
-    : canSeeTheVideos;
-
-  const [{ totalCount }] = await db
-    .select({ totalCount: sql`count(*)` })
-    .from(video)
-    .where(whereConditions);
-
-  const totalVideos = Number(totalCount || 0);
-
-  const totalPages = Math.ceil(totalVideos / pageSize);
-
-  const videoRecords = await buildVideoWithUserQuery()
-    .where(whereConditions)
-    .orderBy(
-      sortFilter ? getOrderByClause(sortFilter) : sql`${video.createdAt} DESC`
-    )
-    .limit(pageSize)
-    .offset((pageNumber - 1) * pageSize);
-
-  return {
-    videos: videoRecords,
-    pagination: {
-      currentPage: pageNumber,
-      totalPages,
-      totalVideos,
-      pageSize,
-    },
-  };
+export async function getVideoById(videoId: string) {
+  try {
+    const [videoRecord] = await buildVideoWithUserQuery().where(
+      eq(video.id, videoId)
+    );
+    return videoRecord;
+  } catch (error) {
+    console.error("Error fetching video by ID:", error);
+    return null;
+  }
 }

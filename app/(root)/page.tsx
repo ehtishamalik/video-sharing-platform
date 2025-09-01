@@ -7,7 +7,7 @@ import { getAllVideos } from "@/lib/actions/video";
 
 const RootPage = async ({ searchParams }: SearchParams) => {
   const { query, filter, page } = await searchParams;
-  const { videos, pagination } = await getAllVideos({
+  const { videos } = await getAllVideos({
     searchQuery: query || "",
     pageNumber: Number(page) || 1,
     sortFilter: filter,
