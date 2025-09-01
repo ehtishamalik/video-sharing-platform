@@ -1,8 +1,9 @@
 "use client";
 
 import React from "react";
-import Image from "next/image";
+import { Image as ImageKit } from "@imagekit/next";
 import Link from "next/link";
+import Image from "next/image";
 
 const VideoCard = ({
   id,
@@ -17,11 +18,12 @@ const VideoCard = ({
 }: VideoCardProps) => {
   return (
     <Link href={`/video/${id}`} className="video-card overflow-clip">
-      <Image
+      <ImageKit
+        urlEndpoint={process.env.NEXT_PUBLIC_IMAGEKIT_URL_ENDPOINT!}
         src={thumbnail}
-        alt="thumbnail"
         width={290}
         height={160}
+        alt="Picture of the author"
         className="w-full"
       />
       <article>
