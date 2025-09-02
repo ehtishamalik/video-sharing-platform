@@ -3,7 +3,7 @@
 import FileInput from "@/components/FileInput";
 import FormField from "@/components/FormField";
 
-import React, { ChangeEvent, FormEvent, useState } from "react";
+import React, { ChangeEvent, FormEvent, useEffect, useState } from "react";
 import { useFileInput } from "@/hooks/useFileInput";
 import { MAX_THUMBNAIL_SIZE, MAX_VIDEO_SIZE } from "@/constants";
 
@@ -37,6 +37,45 @@ const Upload = () => {
   const thumbnail = useFileInput(MAX_THUMBNAIL_SIZE);
 
   const abortController = new AbortController();
+
+  useEffect(() => {
+    return () => {
+      abortController.abort();
+    };
+  }, []);
+
+  useEffect(() => {
+    const checkForRecordedVideo = async () => {
+      try {
+        const stored = sessionStorage.getItem("recordedVideo");
+        if (!stored) return;
+
+        const { url, name, type } = JSON.parse(stored);
+        const blob = await fetch(url).then((res) => res.blob());
+
+        const file = new File([blob], name, { type, lastModified: Date.now() });
+
+        if (video.inputRef.current) {
+          const dataTransfer = new DataTransfer();
+          dataTransfer.items.add(file);
+          video.inputRef.current.files = dataTransfer.files;
+
+          const event = new Event("change", { bubbles: true });
+          video.inputRef.current.dispatchEvent(event);
+
+          video.handleFileChange({
+            target: { files: dataTransfer.files },
+          } as ChangeEvent<HTMLInputElement>);
+        }
+        sessionStorage.removeItem("recordedVideo");
+        URL.revokeObjectURL(url);
+      } catch (error) {
+        console.error("Error accessing recorded video:", error);
+      }
+    };
+
+    checkForRecordedVideo();
+  }, [video]);
 
   const handleInputChange = (e: ChangeEvent) => {
     const { name, value } = e.target as HTMLInputElement;
@@ -148,7 +187,7 @@ const Upload = () => {
     <div className="wrapper-md upload-page">
       <h1>Upload a video</h1>
 
-      {error && <div className="error-field">{error}</div>}
+      {!success && error && <div className="error-field">{error}</div>}
       {success && <div className="success-field">{success}</div>}
 
       <form
@@ -208,7 +247,11 @@ const Upload = () => {
           {isSubmitting ? "Uploading..." : "Upload Video"}
         </button>
         {isSubmitting && (
-          <progress value={progress} max={200} className="w-full"></progress>
+          <progress
+            value={progress - 10}
+            max={200}
+            className="w-full"
+          ></progress>
         )}
       </form>
     </div>
