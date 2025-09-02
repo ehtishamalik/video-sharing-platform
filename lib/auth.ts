@@ -16,5 +16,5 @@ export const auth = betterAuth({
     },
   },
   plugins: [nextCookies()],
-  baseURL: process.env.NEXT_PUBLIC_VERCEL_URL as string,
+  baseURL: `https://${process.env.NEXT_PUBLIC_VERCEL_URL}` as string,
 });
