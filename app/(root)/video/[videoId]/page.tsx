@@ -1,10 +1,9 @@
 import React from "react";
-import Header from "@/components/Header";
+import VideoDetailHeader from "@/components/VideoDetailHeader";
+import VideoPlayer from "@/components/VideoPlayer";
 
 import { redirect } from "next/navigation";
-import { Video } from "@imagekit/next";
 import { getVideoById } from "@/lib/actions/video";
-import VidoDetailHeader from "@/components/VidoDetailHeader";
 
 const Profile = async ({ params }: Params) => {
   const { videoId } = await params;
@@ -16,12 +15,7 @@ const Profile = async ({ params }: Params) => {
 
   return (
     <main className="wrapper page">
-      <Header
-        subHeader="info@ehtishamalik.com"
-        title="Profile"
-        userImg="/assets/images/dummy.jpg"
-      />
-      <VidoDetailHeader
+      <VideoDetailHeader
         username={video.user?.name}
         visibility={video.video.visibility}
         createdAt={video.video.createdAt}
@@ -34,13 +28,9 @@ const Profile = async ({ params }: Params) => {
 
       <section className="video-details">
         <div className="content">
-          <Video
+          <VideoPlayer
+            video={video.video}
             urlEndpoint={process.env.IMAGEKIT_URL!}
-            src={video.video.videoUrl}
-            controls
-            width={500}
-            height={500}
-            className="w-full max-w-4xl mx-auto rounded-2xl"
           />
         </div>
       </section>

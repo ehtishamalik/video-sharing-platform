@@ -1,9 +1,9 @@
-"use client";
-
 import React from "react";
-import { Image as ImageKit } from "@imagekit/next";
 import Link from "next/link";
 import Image from "next/image";
+
+import { Image as ImageKit } from "@imagekit/next";
+import CopyButton from "./CopyButton";
 
 const VideoCard = ({
   id,
@@ -17,9 +17,10 @@ const VideoCard = ({
   visibility,
 }: VideoCardProps) => {
   return (
-    <Link href={`/video/${id}`} className="video-card overflow-clip">
+    <section className="video-card overflow-clip isolate">
+      <Link href={`/video/${id}`} className="absolute inset-0" />
       <ImageKit
-        urlEndpoint={process.env.NEXT_PUBLIC_IMAGEKIT_URL_ENDPOINT!}
+        urlEndpoint={process.env.IMAGEKIT_URL!}
         src={thumbnail}
         width={290}
         height={160}
@@ -60,13 +61,11 @@ const VideoCard = ({
           })}
         </h2>
       </article>
-      <button className="copy-btn">
-        <Image src="/assets/icons/link.svg" alt="copy" width={18} height={18} />
-      </button>
+      <CopyButton id={id} size={18} />
       {duration && (
         <div className="duration">{Math.ceil(duration / 60)}min</div>
       )}
-    </Link>
+    </section>
   );
 };
 

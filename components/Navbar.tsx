@@ -26,7 +26,7 @@ const Navbar = () => {
         </Link>
         {user && (
           <figure>
-            <button onClick={() => router.push("/profile/123")}>
+            <Link href={`/profile/${user.id}`}>
               <Image
                 src={user.image || "/assets/images/dummy.jpg"}
                 alt="user"
@@ -34,8 +34,14 @@ const Navbar = () => {
                 height={36}
                 className="rounded-full aspect-square"
               />
-            </button>
-            <button className="cursor-pointer">
+            </Link>
+            <button
+              className="cursor-pointer"
+              onClick={() => {
+                authClient.signOut();
+                router.push("/sign-in");
+              }}
+            >
               <Image
                 src="/assets/icons/logout.svg"
                 alt="Logout"

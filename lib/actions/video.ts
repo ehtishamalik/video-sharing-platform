@@ -5,7 +5,7 @@ import { user, video } from "@/drizzle/schema";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import { VideoTableInsertType } from "@/drizzle/types";
-import { and, eq, or, sql } from "drizzle-orm";
+import { and, eq, ilike, or, sql } from "drizzle-orm";
 import { doesTitleMatch, getOrderByClause } from "../utils";
 
 const buildVideoWithUserQuery = () => {
@@ -120,5 +120,71 @@ export async function getVideoById(videoId: string) {
   } catch (error) {
     console.error("Error fetching video by ID:", error);
     return null;
+  }
+}
+
+interface GetAllVideosByUser {
+  userIdParameter: string;
+  searchQuery?: string;
+  sortFilter?: string;
+}
+
+export async function GetAllVideosByUser({
+  userIdParameter,
+  searchQuery = "",
+  sortFilter,
+}: GetAllVideosByUser) {
+  try {
+    const session = await auth.api.getSession({
+      headers: await headers(),
+    });
+
+    const currentUserId = session?.user.id;
+
+    if (!currentUserId) {
+      throw new Error("Unauthorized");
+    }
+
+    const isOwner = currentUserId === userIdParameter;
+
+    const [userInfo] = await db
+      .select()
+      .from(user)
+      .where(eq(user.id, userIdParameter));
+
+    if (!userInfo) throw new Error("User not found");
+
+    const conditions = [
+      eq(video.userId, userIdParameter),
+      !isOwner && eq(video.visibility, "public"),
+      searchQuery.trim() && ilike(video.title, `%${searchQuery.trim()}%`),
+    ].filter(Boolean);
+
+    const userVideos = await buildVideoWithUserQuery()
+      .where(and(...(conditions as any[])))
+      .orderBy(
+        sortFilter ? getOrderByClause(sortFilter) : sql`${video.createdAt} DESC`
+      );
+
+    return {
+      user: userInfo,
+      videos: userVideos,
+      count: userVideos.length,
+    };
+  } catch (error) {
+    console.error("Error fetching videos:", error);
+    return {
+      user: null,
+      videos: [],
+      count: 0,
+    };
+  }
+}
+
+export async function updatePlayCount(videoId: string, views: number) {
+  try {
+    await db.update(video).set({ views }).where(eq(video.id, videoId));
+  } catch (error) {
+    console.error("Error updating play count:", error);
   }
 }

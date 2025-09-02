@@ -630,7 +630,7 @@
       figure {
         @apply gap-1 flex items-center;
 
-        button {
+        .user-link {
           @apply flex items-center gap-2 text-gray-100 text-sm font-semibold;
         }
 
