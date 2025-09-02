@@ -168,8 +168,6 @@ const Upload = () => {
             ? (videoUploadResponse.duration as number)
             : null,
       });
-      console.log(thumbnailUploadResponse);
-      console.log(videoUploadResponse);
 
       thumbnail.resetFile();
       video.resetFile();

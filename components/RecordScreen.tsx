@@ -43,7 +43,6 @@ const RecordScreen = () => {
     if (!recordedBlob) return;
 
     const url = URL.createObjectURL(recordedBlob);
-    console.log(url, recordedBlob.type, recordedBlob.size, recordingDuration);
 
     sessionStorage.setItem(
       "recordedVideo",
