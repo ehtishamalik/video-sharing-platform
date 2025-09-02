@@ -10,7 +10,7 @@ const Profile = async ({ params, searchParams }: ParamsWithSearch) => {
   const { id } = await params;
   const { query, filter } = await searchParams;
 
-  const { user, videos, count } = await GetAllVideosByUser({
+  const { user, videos } = await GetAllVideosByUser({
     userIdParameter: id,
     searchQuery: query || "",
     sortFilter: filter || "",

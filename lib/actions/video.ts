@@ -160,11 +160,13 @@ export async function GetAllVideosByUser({
       searchQuery.trim() && ilike(video.title, `%${searchQuery.trim()}%`),
     ].filter(Boolean);
 
+    /* eslint-disable @typescript-eslint/no-explicit-any */
     const userVideos = await buildVideoWithUserQuery()
       .where(and(...(conditions as any[])))
       .orderBy(
         sortFilter ? getOrderByClause(sortFilter) : sql`${video.createdAt} DESC`
       );
+    /* eslint-enable @typescript-eslint/no-explicit-any */
 
     return {
       user: userInfo,

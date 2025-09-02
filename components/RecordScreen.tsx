@@ -6,7 +6,6 @@ import Image from "next/image";
 import { ICONS } from "@/constants";
 import { useRouter } from "next/navigation";
 import { useScreenRecording } from "@/hooks/useScreenRecording";
-import { size } from "zod";
 
 const RecordScreen = () => {
   const router = useRouter();

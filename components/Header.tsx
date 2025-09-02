@@ -3,6 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import DropdownList from "./DropdownList";
 import RecordScreen from "./RecordScreen";
+import SearchInput from "./SearchInput";
 
 const Header = ({ subHeader, title, userImg }: SharedHeaderProps) => {
   return (
@@ -39,10 +40,7 @@ const Header = ({ subHeader, title, userImg }: SharedHeaderProps) => {
 
       <section className="search-filter">
         <div className="search">
-          <input
-            type="text"
-            placeholder="Search for videos, tags, folders..."
-          />
+          <SearchInput />
           <Image
             src="/assets/icons/search.svg"
             alt="search"

@@ -3,7 +3,13 @@
 import FileInput from "@/components/FileInput";
 import FormField from "@/components/FormField";
 
-import React, { ChangeEvent, FormEvent, useEffect, useState } from "react";
+import React, {
+  ChangeEvent,
+  FormEvent,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import { useFileInput } from "@/hooks/useFileInput";
 import { MAX_THUMBNAIL_SIZE, MAX_VIDEO_SIZE } from "@/constants";
 
@@ -36,13 +42,13 @@ const Upload = () => {
   const video = useFileInput(MAX_VIDEO_SIZE);
   const thumbnail = useFileInput(MAX_THUMBNAIL_SIZE);
 
-  const abortController = new AbortController();
+  const abortController = useMemo(() => new AbortController(), []);
 
   useEffect(() => {
     return () => {
       abortController.abort();
     };
-  }, []);
+  }, [abortController]);
 
   useEffect(() => {
     const checkForRecordedVideo = async () => {
@@ -79,7 +85,7 @@ const Upload = () => {
 
   const handleInputChange = (e: ChangeEvent) => {
     const { name, value } = e.target as HTMLInputElement;
-    setFormData((prev) => ({ ...prev, [name]: value.trim() }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const authenticator = async () => {
@@ -141,12 +147,21 @@ const Upload = () => {
         },
         abortSignal: abortController.signal,
       });
+
+      if (
+        !videoUploadResponse.url ||
+        !thumbnailUploadResponse.url ||
+        !videoUploadResponse.fileId
+      ) {
+        throw new Error("Video upload failed");
+      }
+
       await addVideoDetails({
-        title: formData.title,
-        description: formData.description,
-        thumbnailUrl: thumbnailUploadResponse.url || "",
-        videoUrl: videoUploadResponse.url || "",
-        videoId: videoUploadResponse.fileId || "",
+        title: formData.title.trim(),
+        description: formData.description.trim(),
+        thumbnailUrl: thumbnailUploadResponse.url,
+        videoUrl: videoUploadResponse.url,
+        videoId: videoUploadResponse.fileId,
         visibility: formData.visibility,
         duration:
           "duration" in videoUploadResponse
