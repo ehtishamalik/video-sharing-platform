@@ -135,6 +135,7 @@ const Upload = () => {
         publicKey: thumbnailAuth.publicKey,
         file: thumbnail.file,
         fileName: thumbnail.file.name,
+        tags: [process.env.NODE_ENV],
         onProgress: (event) => {
           setProgress((event.loaded / event.total) * 100);
         },
@@ -151,6 +152,7 @@ const Upload = () => {
         publicKey: videoAuth.publicKey,
         file: video.file,
         fileName: video.file.name,
+        tags: [process.env.NODE_ENV],
         onProgress: (event) => {
           setProgress((event.loaded / event.total) * 100);
         },
