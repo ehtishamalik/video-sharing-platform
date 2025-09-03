@@ -1,10 +1,10 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
+import clsx from "clsx";
+
 import { Ban, LoaderCircle, ThumbsUp } from "lucide-react";
 import { useRouter } from "next/navigation";
-
-import { LikeTableSelectType } from "@/drizzle/types";
 import { authClient } from "@/lib/auth-client";
 import { SessionType } from "@/types";
 import {
@@ -13,7 +13,6 @@ import {
   getUserLike,
   removeVideoLike,
 } from "@/lib/actions/like";
-import clsx from "clsx";
 
 const LikeButton = ({ videoId }: { videoId: string }) => {
   const router = useRouter();
@@ -91,7 +90,7 @@ const LikeButton = ({ videoId }: { videoId: string }) => {
     };
 
     initialLoad();
-  }, [videoId]);
+  }, [router, videoId]);
 
   if (error) {
     return (

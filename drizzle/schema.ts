@@ -3,9 +3,7 @@ import {
   text,
   timestamp,
   boolean,
-  uuid,
   integer,
-  unique,
 } from "drizzle-orm/pg-core";
 
 export const user = pgTable("user", {
