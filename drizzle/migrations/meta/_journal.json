@@ -5,22 +5,8 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1756541882568,
-      "tag": "0000_smart_the_phantom",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "7",
-      "when": 1756737607148,
-      "tag": "0001_fresh_mimic",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "7",
-      "when": 1756748216274,
-      "tag": "0002_furry_madame_masque",
+      "when": 1756884943439,
+      "tag": "0000_cheerful_nightshade",
       "breakpoints": true
     }
   ]

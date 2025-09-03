@@ -3,6 +3,12 @@ import { twMerge } from "tailwind-merge";
 import { ilike, sql } from "drizzle-orm";
 import { video } from "@/drizzle/schema";
 import { DEFAULT_VIDEO_CONFIG, DEFAULT_RECORDING_CONFIG } from "@/constants";
+import { customAlphabet } from "nanoid";
+
+export const nanoid = customAlphabet(
+  "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz",
+  32
+);
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));

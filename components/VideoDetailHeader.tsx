@@ -4,6 +4,7 @@ import CopyButton from "./CopyButton";
 import Link from "next/link";
 
 import { daysAgo } from "@/lib/utils";
+import LikeButton from "./LikeButton";
 
 const VideoDetailHeader = ({
   title,
@@ -35,6 +36,7 @@ const VideoDetailHeader = ({
         </figure>
       </aside>
       <aside className="cta">
+        <LikeButton videoId={videoId} />
         <CopyButton id={videoId} size={24} />
       </aside>
     </header>

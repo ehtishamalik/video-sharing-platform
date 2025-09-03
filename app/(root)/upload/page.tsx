@@ -21,6 +21,9 @@ import {
   upload,
 } from "@imagekit/next";
 import { addVideoDetails } from "@/lib/actions/video";
+import { nanoid } from "@/lib/utils";
+import Link from "next/link";
+import { ChevronLeft } from "lucide-react";
 
 const Upload = () => {
   const [formData, setFormData] = useState<{
@@ -38,6 +41,7 @@ const Upload = () => {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+  const [uploadStatus, setUploadStatus] = useState<string>("Upload Video");
 
   const video = useFileInput(MAX_VIDEO_SIZE);
   const thumbnail = useFileInput(MAX_THUMBNAIL_SIZE);
@@ -45,10 +49,12 @@ const Upload = () => {
   const abortController = useMemo(() => new AbortController(), []);
 
   useEffect(() => {
-    return () => {
-      abortController.abort();
-    };
-  }, [abortController]);
+    const timeout = setTimeout(() => {
+      setSuccess(null);
+    }, 3000);
+
+    return () => clearTimeout(timeout);
+  }, [success]);
 
   useEffect(() => {
     const checkForRecordedVideo = async () => {
@@ -120,6 +126,7 @@ const Upload = () => {
 
     try {
       setIsSubmitting(true);
+      setUploadStatus("Uploading Thumbnail...");
       const thumbnailAuth = await authenticator();
       const thumbnailUploadResponse = await upload({
         expire: thumbnailAuth.expire,
@@ -129,11 +136,13 @@ const Upload = () => {
         file: thumbnail.file,
         fileName: thumbnail.file.name,
         onProgress: (event) => {
-          setProgress((prev) => (prev += (event.loaded / event.total) * 100));
+          setProgress((event.loaded / event.total) * 100);
         },
         abortSignal: abortController.signal,
       });
 
+      setProgress(0);
+      setUploadStatus("Uploading Video...");
       const videoAuth = await authenticator();
       const videoUploadResponse = await upload({
         expire: videoAuth.expire,
@@ -143,7 +152,7 @@ const Upload = () => {
         file: video.file,
         fileName: video.file.name,
         onProgress: (event) => {
-          setProgress((prev) => (prev += (event.loaded / event.total) * 100));
+          setProgress((event.loaded / event.total) * 100);
         },
         abortSignal: abortController.signal,
       });
@@ -156,7 +165,9 @@ const Upload = () => {
         throw new Error("Video upload failed");
       }
 
+      setUploadStatus("Saving Video...");
       await addVideoDetails({
+        id: nanoid(),
         title: formData.title.trim(),
         description: formData.description.trim(),
         thumbnailUrl: thumbnailUploadResponse.url,
@@ -193,12 +204,20 @@ const Upload = () => {
       setError("Failed to upload video. Please try again!");
     } finally {
       setIsSubmitting(false);
+      setUploadStatus("Upload Video");
     }
   };
 
   return (
     <div className="wrapper-md upload-page">
       <h1>Upload a video</h1>
+      <Link
+        href="/"
+        className="text-pink-100 hover:text-pink-100/60 flex items-center mr-auto mb-4"
+      >
+        <ChevronLeft size={16} />
+        {""}Go back to home
+      </Link>
 
       {!success && error && <div className="error-field">{error}</div>}
       {success && <div className="success-field">{success}</div>}
@@ -257,14 +276,10 @@ const Upload = () => {
           onChange={handleInputChange}
         />
         <button type="submit" disabled={isSubmitting} className="submit-button">
-          {isSubmitting ? "Uploading..." : "Upload Video"}
+          {uploadStatus}
         </button>
         {isSubmitting && (
-          <progress
-            value={progress - 10}
-            max={200}
-            className="w-full"
-          ></progress>
+          <progress value={progress} max={200} className="w-full"></progress>
         )}
       </form>
     </div>

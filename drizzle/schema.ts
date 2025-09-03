@@ -5,6 +5,7 @@ import {
   boolean,
   uuid,
   integer,
+  unique,
 } from "drizzle-orm/pg-core";
 
 export const user = pgTable("user", {
@@ -68,7 +69,7 @@ export const verification = pgTable("verification", {
 });
 
 export const video = pgTable("video", {
-  id: uuid("id").primaryKey().defaultRandom().unique(),
+  id: text("id").primaryKey().unique(),
   title: text("title").notNull(),
   description: text("description").notNull(),
   videoUrl: text("video_url").notNull(),
@@ -80,6 +81,36 @@ export const video = pgTable("video", {
     .references(() => user.id, { onDelete: "cascade" }),
   views: integer("views").notNull().default(0),
   duration: integer("duration"),
+  createdAt: timestamp("created_at")
+    .$defaultFn(() => /* @__PURE__ */ new Date())
+    .notNull(),
+  updatedAt: timestamp("updated_at")
+    .$defaultFn(() => /* @__PURE__ */ new Date())
+    .notNull(),
+});
+
+export const like = pgTable("like", {
+  id: text("id").primaryKey().unique(),
+  userId: text("user_id")
+    .notNull()
+    .references(() => user.id, { onDelete: "set null" }),
+  videoId: text("video_id")
+    .notNull()
+    .references(() => video.id, { onDelete: "cascade" }),
+  createdAt: timestamp("created_at")
+    .$defaultFn(() => /* @__PURE__ */ new Date())
+    .notNull(),
+});
+
+export const comment = pgTable("comment", {
+  id: text("id").primaryKey().unique(),
+  content: text("content").notNull(),
+  userId: text("user_id")
+    .notNull()
+    .references(() => user.id, { onDelete: "set null" }),
+  videoId: text("video_id")
+    .notNull()
+    .references(() => video.id, { onDelete: "cascade" }),
   createdAt: timestamp("created_at")
     .$defaultFn(() => /* @__PURE__ */ new Date())
     .notNull(),

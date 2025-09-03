@@ -550,7 +550,7 @@
     }
 
     .duration {
-      @apply absolute top-40 right-2 bg-dark-100 font-medium text-white text-xs px-2.5 py-1 rounded-full;
+      @apply absolute top-[136px] right-2 bg-dark-100 font-medium text-white text-xs px-2.5 py-1 rounded-full;
     }
   }
 
